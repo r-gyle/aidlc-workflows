@@ -51,7 +51,7 @@ Core ships 11 named scopes. Each scope defines a stage set, a default depth leve
 
 - **Stages:** 9 of 33
 - **Default depth:** Minimal
-- **Includes:** Deployment Pipeline and Deployment Execution so the verified fix ships
+- **Includes:** Deployment Pipeline and Deployment Execution so the verified fix ships; both skip without deployment questions when the project has no deployment target
 - **Skips:** Market Research, Feasibility, Team Formation, Mockups, most design and architecture stages, environment provisioning, and broader operational readiness
 
 ### refactor
@@ -60,7 +60,7 @@ Core ships 11 named scopes. Each scope defines a stage set, a default depth leve
 
 - **Stages:** 10 of 33
 - **Default depth:** Minimal
-- **Includes:** Functional Design plus Deployment Pipeline and Deployment Execution
+- **Includes:** Functional Design plus Deployment Pipeline and Deployment Execution, which skip without deployment questions when the project has no deployment target
 - **Skips:** Similar to bugfix — focused on code analysis, design, implementation, and deployment through the existing path
 
 ### infra

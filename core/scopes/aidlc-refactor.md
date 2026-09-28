@@ -33,7 +33,9 @@ shape), then code-generation and build-and-test (apply and verify the
 existing suite stays green). It skips discovery, environment provisioning,
 and broader operational readiness because there is no new product or
 infrastructure surface, while deployment-pipeline and deployment-execution
-carry the verified refactor through the existing delivery path. One of the
+carry the verified refactor through the existing delivery path. When the
+project has no deployment target, both stages report skipped without asking
+deployment questions. One of the
 three incremental scopes that skip the walking-skeleton ceremony.
 
 ## Membership
