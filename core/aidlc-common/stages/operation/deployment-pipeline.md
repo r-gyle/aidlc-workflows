@@ -54,10 +54,54 @@ Incremental scopes (`bugfix`, `refactor`, and `security-patch`) and `express`
 skip CI Pipeline and Infrastructure Design by design. On brownfield, inspect
 the workspace's existing pipeline and infrastructure configuration plus the
 code knowledge base. On Express greenfield, use the approved requirements,
-Build and Test results, and deployment artifacts generated in the workspace
-(for example a Dockerfile, service manifest, or IaC); if no deployable target
-exists, this CONDITIONAL stage reports skipped. Design only against evidence
-that exists - never invent a missing CI or infrastructure artifact.
+Build and Test results, and deployment artifacts generated in the workspace.
+Design only against evidence that exists - never invent a missing CI or
+infrastructure artifact.
+
+#### Applicability check (every scope, before any question)
+
+A **deployable target** is an active definition of how this project ships: a
+CD workflow or pipeline file that is not disabled or wholly commented out,
+infrastructure as code (CDK, CloudFormation, SAM, Terraform, Serverless), or a
+deployment manifest (a service or orchestration manifest, Kubernetes
+manifests, or a hosting platform's deploy file). A Dockerfile or build script
+on its own is not a target. Decide from that evidence before Step 2:
+
+| Evidence | Scope | Action |
+|---|---|---|
+| Active target, and the approved requirements need no change to how it ships | any | Report skipped: the existing pipeline is adequate, and Deployment Execution deploys through it |
+| No target | `bugfix`, `refactor`, `express` | Report skipped: the change did not ask for delivery infrastructure |
+| No target | `security-patch` | Ask the question below: the patch must still reach production |
+| No target | any other scope | Continue to Step 2 only when the approved requirements or scope include deploying; otherwise ask the question below |
+| Ambiguous: a disabled or commented-out pipeline, or deploy scripts with no clear target | any | Ask the question below |
+| Anything else | any | Continue to Step 2 |
+
+To report skipped, name what you checked and found in the reason, because
+Deployment Execution reads it:
+
+```bash
+{{INVOKE}} engine orchestrate report --stage deployment-pipeline --result skipped --reason "<evidence checked and why this stage does not apply>"
+```
+
+When the table says to ask, record the prompt with
+`{{INVOKE}} engine log decision --stage deployment-pipeline --decision "<what was and was not found>" --options "Skip deployment for this change,Set up deployment"`,
+present this structured question, and end the turn:
+
+```question
+prompt: "<One sentence naming the deployment evidence found or missing.> How should this change handle deployment?"
+header: Deployment
+multiSelect: false
+options:
+  - label: Skip deployment for this change
+    description: It ships outside this workflow, or does not need to ship
+  - label: Set up deployment
+    description: Design a deployment pipeline as part of this workflow
+```
+
+After the human answers, record
+`{{INVOKE}} engine log answer --stage deployment-pipeline --details "<exact choice>"`.
+On **Skip deployment for this change**, report skipped and include the human's
+choice in the reason. On **Set up deployment**, continue to Step 2.
 
 ### Step 2: Generate Clarifying Questions
 
