@@ -952,6 +952,19 @@ Before creating any artifact file, validate:
 - No naming conflicts with existing artifacts (e.g., two components with the same name)
 - File path matches the expected convention for the stage
 
+### Cross-artifact references
+When an artifact refers to another artifact by name, link it: a real relative
+Markdown link (`[architecture.md](../architecture.md)`), not a bare filename or
+a prose mention like "see architecture.md". This costs nothing extra to write,
+keeps every artifact navigable from a plain file browser or a Git host's own
+renderer, and is what any link-aware viewer (an IDE, a notes app) picks up on
+its own — no artifact needs to know one exists.
+
+Record a finding once, in the artifact that owns it, and link to it from
+elsewhere rather than repeating it. Reverse Engineering already states this
+locally for its own nine artifacts; this generalizes the same rule to every
+stage's output.
+
 ### Template overrides
 Before writing artifact `X` (keyed by the output filename stem — artifact `X` writes to `X.md`), resolve its template in this order, override-before-default, first hit wins:
 1. **team template** — `aidlc/spaces/<space>/memory/templates/X.md` (the active space's hand-authored override);
