@@ -33,7 +33,9 @@ whole design ceremony (ideation, domain-design, units-generation,
 nfr-design, infrastructure-design) because the change is targeted. Like the
 other incremental scopes it keeps deployment-pipeline and
 deployment-execution EXECUTE — a patch that never deploys does not close the
-vulnerability. Its distinctive stage is nfr-requirements, which records the
+vulnerability. Unlike them, it does not skip deployment silently when the
+project has no deployment target: Deployment Pipeline asks how the patch
+reaches production. Its distinctive stage is nfr-requirements, which records the
 security constraint; requirements-analysis also runs so there is an auditable
 statement of the vulnerability and its remediation criteria (the
 `requirements` artifact nfr-requirements and code-generation consume). One of

@@ -32,7 +32,8 @@ what exists (reverse-engineering), state what "fixed" means
 build-and-test). It does not need market-research, user-stories,
 domain-design, environment provisioning, or broader operational readiness,
 but it retains deployment-pipeline and deployment-execution so the verified
-fix can ship. This scope is one of the three incremental scopes that skip the
+fix can ship. When the project has no deployment target, both stages report
+skipped without asking deployment questions. This scope is one of the three incremental scopes that skip the
 walking-skeleton ceremony (alongside `refactor` and `security-patch`), since
 there is nothing to bootstrap.
 

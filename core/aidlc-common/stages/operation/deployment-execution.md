@@ -56,15 +56,32 @@ Incremental scopes (`bugfix`, `refactor`, `security-patch`, and `infra`) plus
 `express` may skip Environment Provisioning or Build and Test by design.
 `bugfix`, `refactor`, `security-patch`, and `express` retain Build and Test but
 skip Environment Provisioning; `infra` retains Environment Provisioning but
-skips Build and Test. Deployment Pipeline may also report skipped when the
-workspace's existing pipeline is already adequate; in that case its absent
-`cd-config` and `deployment-strategy` artifacts are expected, and this stage
-must inspect and use the real pipeline configuration in the workspace instead
-of invoking missing-artifact recovery. Inventory actual target environments
-from that workspace configuration and any approved Deployment Pipeline
-artifacts. For Express greenfield, deployment proceeds only when those files
-identify a real target; otherwise this CONDITIONAL stage reports skipped.
-Never invent an environment inventory or deployment path.
+skips Build and Test.
+
+Deployment Pipeline runs an applicability check and may report skipped for one
+of two reasons. Read its recorded reason before any question:
+
+```bash
+{{INVOKE}} engine audit history --stage deployment-pipeline --event STAGE_SKIPPED
+```
+
+- **Existing pipeline adequate.** Its absent `cd-config` and
+  `deployment-strategy` artifacts are expected. Inspect and use the real
+  pipeline configuration in the workspace instead of invoking missing-artifact
+  recovery, and inventory actual target environments from it.
+- **No deployable target, or the human chose to skip deployment for this
+  change.** This stage does not apply. Ask no pre-deployment questions; report
+  skipped with the same reason:
+
+  ```bash
+  {{INVOKE}} engine orchestrate report --stage deployment-execution --result skipped --reason "<Deployment Pipeline's recorded reason>"
+  ```
+
+With no skip row, Deployment Pipeline ran: use its approved artifacts and the
+workspace configuration. If a skip reason is unclear, apply Deployment
+Pipeline's applicability check to the workspace yourself; with no deployable
+target, report skipped. Never invent an environment inventory or deployment
+path.
 
 ### Step 2: Pre-Deployment Checks
 
