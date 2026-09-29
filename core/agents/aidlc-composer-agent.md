@@ -667,6 +667,7 @@ one SHORT line per stage (≤15 words), not a paragraph.
   "guardPolicyRationale": "<1-2 sentences: which fences this value lowers (strict: none; relaxed: plan approval and review freeze; off: those plus state transition and reviewer scope) and why an input change after approval should reopen it, or be recorded and continue>",
   "scopeSettings": { "sensors": "on | off", "learnings": "on | off", "summary_confirmation": "on | off", "plan_approval": "on | off", "review_cap": "adversarial | advisory | none" },
   "scopeSettingsRationale": "<front/report only, 1-2 sentences: which settings are off or capped and why this work does not need them, or that they match the stock scope>",
+  "openQuestions": [{ "question": "<front/report only, at most three: one plain sentence>", "options": ["<2-4 short answers>"], "decides": "<which stages or setting each answer flips>" }],
   "creationSettings": { "learnings": "off", "review": "adversarial" },
   "settingsChanges": { "sensors": "off" },
   "baseScope": "<custom only: the stock scope the plan runs on>",
@@ -691,6 +692,30 @@ contains task text, copy the dispatch's task text exactly without paraphrasing. 
 composition, derive a concise description from the report's actual findings;
 for a task-less front composition, derive it from the proposed work the human
 will approve. Never return a front/report proposal that would create from only a scope name.
+
+`openQuestions` is REQUIRED for `mode: "matched"` and `mode: "custom"` (`[]`
+when nothing is open) and omitted for `mode: "in-flight"`, where completed
+stages are the evidence. It lists at most three questions, and only when IAE
+or UA is MED or HIGH and a specific decision in your grid hinges on one fact
+that neither the task text, the scan, the report, nor CodeKB settles: whether
+the change touches a user interface, who uses it, or whether the work ships
+anywhere. Ask the fewest that settle the most. Each entry carries `question`
+(one plain sentence in the person's terms), `options` (two to four short
+answers; the person may answer otherwise), and `decides` (one line naming the
+stages or setting each answer flips, for example "No UI: SKIP user-stories,
+refined-mockups"). Never ask what that evidence already answers, never ask
+about the scope settings or Guard Policy (their rows cover them), and never
+ask a question whose every answer leaves the grid as it is. The proposal stays
+complete without answers: decide each hinged stage on your best reading and
+name the question it rests on in that stage's rationale ("assumed backend
+only; question 1"), so approving as is runs exactly what the table shows.
+
+An answer is an edit. The re-dispatch's task text carries the person's
+answers after the original request; they are part of the task. Re-score IAE
+and UA, re-run validation, and return only the questions still open: never
+repeat one the person answered. Copy the whole task text, answers included,
+into `creationDescription`, so later stages read those decisions as the
+person's own words instead of asking again.
 
 `guardPolicy` is REQUIRED for every mode and is ONE value with a 1-2 sentence
 `guardPolicyRationale` naming the fences it lowers and why an input change
@@ -831,7 +856,9 @@ Step 4 folds and every Step 7 stock-adoption change. For an adopted stock row,
 name the selected stock scope in the reason and preserve the dropped-flip
 explanation in the advisories below the table. Every untouched row keeps the
 tool's mechanical screen verbatim. Before returning, compare every table
-decision to `grid`; any mismatch means the proposal is not ready.
+decision to `grid`; any mismatch means the proposal is not ready. A stage that
+rests on one of your `openQuestions` says so in its reason. The questions
+themselves are not a table: the conductor lists them from the JSON.
 
 **These tables are supporting evidence, not the headline.** The user is a
 developer who asked for help with their project, so the conductor presents
