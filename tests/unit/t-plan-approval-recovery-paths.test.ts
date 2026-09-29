@@ -1,4 +1,4 @@
-// covers: subcommand:aidlc-log:decision, subcommand:aidlc-log:answer, audit:PLAN_APPROVAL_RECORDED, function:recordPlanApprovalHumanResponse, function:withdrawPlanApprovalResponse
+// covers: subcommand:aidlc-log:decision, subcommand:aidlc-log:answer, audit:PLAN_APPROVAL_RECORDED, function:recordPlanApprovalHumanResponse, function:withdrawPlanApprovalResponse, function:planCarriesApprovalTags
 //
 // The ways a conductor can stall at the Code Generation Plan Approval gate,
 // driven through the same commands the stage file tells it to run
@@ -28,6 +28,7 @@ import {
 import {
   codeGenerationRecordDir,
   evaluateCodeGenerationApproval,
+  PLAN_CARRIES_APPROVAL_TAGS,
 } from "../../core/tools/aidlc-testing-posture.ts";
 import {
   cleanupTestProject,
@@ -238,6 +239,40 @@ describe("Plan Approval recovery paths: every refusal names a step that works", 
     expect(refusal(refused)).toContain("Re-run the fingerprint command");
     expect(readAuditShardEvents(project).some((row) => row.event === "DECISION_RECORDED")).toBe(false);
 
+    presentAndApprove(project, session);
+  });
+
+  test("tags copied into the plan are refused by name everywhere, and moving them out recovers", () => {
+    const session = "recovery-tags-in-plan";
+    const project = createProject(session);
+    const rendered = posture(project, "render");
+    writePlan(project, rendered.out);
+    const tags = fingerprint(project);
+    expect(tags.code, tags.err).toBe(0);
+    writeQuestions(project, tags.out);
+    // The misread: "write BOTH into the Plan Approval section" taken to mean the plan.
+    writePlan(project, rendered.out, `\n${tags.out.trim()}\n`);
+
+    const decided = decide(project, session);
+    expect(decided.code).not.toBe(0);
+    expect(refusal(decided)).toBe(PLAN_CARRIES_APPROVAL_TAGS);
+    expect(readAuditShardEvents(project).some((row) => row.event === "DECISION_RECORDED")).toBe(false);
+    // Re-fingerprinting must not hand back a new value to paste into the same
+    // plan: that was the loop. It names the fix instead.
+    const again = fingerprint(project);
+    expect(again.code).not.toBe(0);
+    expect(refusal(again)).toBe(PLAN_CARRIES_APPROVAL_TAGS);
+    expect(evaluateCodeGenerationApproval(project, { unit: null }).reason).toBe(PLAN_CARRIES_APPROVAL_TAGS);
+
+    writePlan(project, rendered.out);
+    presentAndApprove(project, session);
+  });
+
+  test("a tag shown inside a fenced example in the plan is not mistaken for a copied tag", () => {
+    const session = "recovery-fenced-tag";
+    const project = createProject(session);
+    const example = `[Approval Fingerprint]: ${"sha256:v3:"}${"a".repeat(64)}`;
+    writePlan(project, posture(project, "render").out, `\n\`\`\`text\n${example}\n\`\`\`\n`);
     presentAndApprove(project, session);
   });
 

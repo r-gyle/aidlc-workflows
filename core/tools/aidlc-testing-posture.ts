@@ -451,6 +451,22 @@ const PLANNED_SOURCE_TAG_RE =
   /^\[Planned Source\]:[ \t]*([0-9a-f]{40}|[0-9a-f]{64}|unbindable)?[ \t]*$/;
 export const APPROVAL_FINGERPRINT_PREFIX = "sha256:v3:";
 
+// The fingerprint covers the plan, so a tag copied into the plan changes the
+// value it records and can never verify. Name the one fix instead of a bare
+// mismatch, which a conductor answers by re-fingerprinting into the same file.
+export const PLAN_CARRIES_APPROVAL_TAGS =
+  "code-generation-plan.md contains an [Approval Fingerprint] or [Planned Source] tag. " +
+  "The fingerprint covers the plan, so a tag written into it changes the value it records. " +
+  "Delete those tag lines from the plan, re-run the fingerprint command, and record both tags " +
+  "only in the Plan Approval section of code-generation-questions.md.";
+
+/** Whether the plan itself carries a Plan Approval tag outside fences and comments. */
+export function planCarriesApprovalTags(plan: string): boolean {
+  return visibleMarkdownLines(plan).some(
+    (line) => FINGERPRINT_TAG_RE.test(line) || PLANNED_SOURCE_TAG_RE.test(line),
+  );
+}
+
 export function approvalFingerprintIsCurrentFormat(tag: string | null): boolean {
   return tag?.startsWith(APPROVAL_FINGERPRINT_PREFIX) === true;
 }
@@ -3266,6 +3282,9 @@ function planApprovalQuestionEvidence(
   if (!artifacts.contractValid || artifacts.expectedFingerprint === null) {
     throw new Error("Plan Approval requires the current Testing Contract");
   }
+  if (planCarriesApprovalTags(artifacts.plan)) {
+    throw new Error(PLAN_CARRIES_APPROVAL_TAGS);
+  }
   if (artifacts.recordedFingerprint !== artifacts.expectedFingerprint) {
     throw new Error(
       artifacts.recordedFingerprint !== null &&
@@ -3973,6 +3992,12 @@ export function evaluateCodeGenerationApproval(
         "the approved Testing Contract is stale because memory, scope, test strategy, project type, or the installed AIDLC version changed";
       return empty;
     }
+    // Checked before the answer: an approval over a tagged plan can never
+    // verify, so naming the tag is the actionable reason even before approval.
+    if (planCarriesApprovalTags(artifacts.plan)) {
+      empty.reason = PLAN_CARRIES_APPROVAL_TAGS;
+      return empty;
+    }
     if (!empty.approved) {
       empty.reason = "Plan Approval is not explicitly answered Approve Plan";
       return empty;
@@ -4332,6 +4357,7 @@ export function main(argv: string[]): void {
         const approval = evaluateCodeGenerationApproval(projectDir, target);
         const stageDir = authority.stageDir;
         const plan = readFileSync(join(stageDir, "code-generation-plan.md"), "utf-8");
+        if (planCarriesApprovalTags(plan)) throw new Error(PLAN_CARRIES_APPROVAL_TAGS);
         const instructions = readFileSync(
           join(stageDir, "unit-test-instructions.md"),
           "utf-8",

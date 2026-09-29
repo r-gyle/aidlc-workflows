@@ -218,7 +218,10 @@ bun {{HARNESS_DIR}}/tools/aidlc-testing-posture.ts fingerprint --stage-level
 ```
 
 The command prints two copy-ready tag lines. Write BOTH into the Plan Approval
-section verbatim, followed by both options below and a blank `[Answer]:` tag:
+question in `code-generation-questions.md` verbatim, followed by both options
+below and a blank `[Answer]:` tag. Never write them into
+`code-generation-plan.md`: the fingerprint covers the plan, so a tag there
+changes the value it records and approval can never verify.
 
 ```
 [Approval Fingerprint]: sha256:v3:<hex>
