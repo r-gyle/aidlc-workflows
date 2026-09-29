@@ -189,6 +189,24 @@ ceremony runs inside them. Every front/report proposal names all five in its
   environment listings, and harness settings files can hold credentials.
   Never put command text in `settingsChanges` or `creationSettings`.
 
+## Open questions
+
+A vague request costs twice when it is scored alone: high Intent Ambiguity
+keeps discovery stages in the grid, and those stages then ask the person the
+questions anyway. `openQuestions` asks the few that decide the grid before
+anything runs, at most three, each naming what its answer flips.
+
+| Ask | Do not ask |
+|-----|------------|
+| "Does this change touch any screen the user sees?" when user-stories and refined-mockups hinge on it | "What framework does the project use?" when the scan names it |
+| "Does this need to ship anywhere, or is it local only?" when the deployment tail hinges on it | "Should reviews be on?" (the settings row covers it) |
+| "Is this for one team or for outside customers?" when compliance or market stages hinge on it | Anything whose every answer leaves the grid as it is |
+
+The grid stays complete without answers: decide each hinged stage on your best
+reading and say in its rationale which question it rests on. Answers come back
+as part of the task text and land in `creationDescription`, which is what lets
+later stages skip the same question.
+
 ## Rationale quality
 
 The gate is only as good as the rationale. For each SKIP write one line a
