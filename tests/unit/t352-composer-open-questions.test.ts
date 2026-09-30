@@ -24,7 +24,6 @@ import {
 const ORCH = join(AIDLC_SRC, "tools", "aidlc-orchestrate.ts");
 const REPO_ROOT = join(import.meta.dir, "..", "..");
 const HEADING = "Questions that could change this plan";
-const ANSWERS_LINE = "Answers to the composer's questions:";
 const tempDirs: string[] = [];
 
 afterEach(() => {
@@ -69,7 +68,8 @@ describe("t352 (1) every composer surface names the open-questions contract", ()
       const text = flat(read(surface));
       expect(text, surface).toContain(`**${HEADING}**`);
       expect(text, surface).toContain("(at most three)");
-      expect(text, surface).toContain(`An answer is an edit: re-dispatch the composer with the original task text followed by "${ANSWERS_LINE}"`);
+      expect(text, surface).toContain("An answer is an edit: follow the dispatch's answer route");
+      expect(text, surface).toContain("`next compose --request <id> --with-answers`");
       expect(text, surface).toContain("quoted exactly, never paraphrased");
       expect(text, surface).toContain("never add your own");
     }
@@ -97,7 +97,8 @@ describe("t352 (2) the agent asks only questions that change the plan", () => {
   test("the proposal stays complete without answers, and answers persist with the request", () => {
     expect(agent).toContain("The proposal stays complete without answers");
     expect(agent).toContain("never repeat one the person answered");
-    expect(agent).toContain("Copy the whole task text, answers included, into `creationDescription`");
+    expect(agent).toContain("The engine adds the person's answers to the stored request");
+    expect(agent).toContain("the workflow is created from that same stored request");
   });
 });
 
@@ -106,7 +107,7 @@ describe("t352 (3) the compose dispatch", () => {
     const message = composeMessage(project(), ["fix the token bug"]);
     expect(message).toContain("up to three openQuestions (each a question, its options, and which stages or setting its answer decides; [] when nothing is open)");
     expect(message).toContain(`a numbered list headed "${HEADING}"`);
-    expect(message).toContain(`followed by "${ANSWERS_LINE}"`);
+    expect(message).toMatch(/run `next compose --request \S+ --with-answers`, and follow the dispatch it returns/);
   });
 
   test("in-flight: no questions, since completed stages are the evidence", () => {

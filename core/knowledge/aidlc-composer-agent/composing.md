@@ -204,9 +204,10 @@ anything runs, at most three, each naming what its answer flips.
 | "Is this for one team or for outside customers?" when compliance or market stages hinge on it | Anything whose every answer leaves the grid as it is |
 
 The grid stays complete without answers: decide each hinged stage on your best
-reading and say in its rationale which question it rests on. Answers come back
-as part of the task text and land in `creationDescription`, which is what lets
-later stages skip the same question.
+reading and say in its rationale which question it rests on. The engine adds
+the answers to the stored request, so they come back as part of the task text
+and reach the created workflow's description, which is what lets later stages
+skip the same question.
 
 ## Rationale quality
 
