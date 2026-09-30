@@ -5368,10 +5368,15 @@ function routeNext(args: string[], projectDir: string | undefined): void {
     // A new-work question's "tailor a plan" answer composes that new work even
     // when other work became active meanwhile; only a routing question's
     // reshape (or a plain `next compose`) re-shapes the running workflow.
-    const inFlight = stateContent !== null && question?.origin !== "front";
+    // A completed workflow has no pending stages to reshape, so compose over it
+    // plans the request as new work beside it.
+    const activeComplete = stateContent !== null && getField(stateContent, "Status") === "Completed";
+    const inFlight = stateContent !== null && !activeComplete && question?.origin !== "front";
     // Only a front composition continues into creation, which needs the
     // request by id; an in-flight reshape carries its text in the dispatch.
-    if (flags.intent && !flags.request && !inFlight) {
+    // A routing question's request is re-saved as front so its approval
+    // creates a new intent instead of answering the routing question.
+    if (flags.intent && !inFlight && (!flags.request || question?.origin !== "front")) {
       flags.request = saveQuestion(pd, flags.intent, flags.scope ?? "").id;
     }
     emit(composeDispatchDirective(flags, inFlight));
@@ -5714,6 +5719,29 @@ function routeNext(args: string[], projectDir: string | undefined): void {
     // inferScopeFromText always returns a deterministic scope, including its
     // selection-aware fallback for rich prose.
     const inferred = { scope: routingScopeProposal ?? inferScopeFromText(authoritativeRequest(flags.intent)).scope };
+    const askedAbout = {
+      space: selection.space,
+      targets: [{ intent: selection.intent ?? "", uuid: intentUuidForSelection(pd, selection) ?? "" }],
+    };
+    // A completed workflow has nothing to continue or reshape, so the only real
+    // choices are how to start the new work; compose then plans it as new work.
+    if (getField(stateContent, "Status") === "Completed") {
+      emit(newWorkRoutingAskDirective(
+        `The last piece of work, "${activeLabel}", is complete. You said: "${requestPreview(flags.intent)}". ` +
+          `Should I (1) start it now - Yes, set it up as "${inferred.scope}" work; ` +
+          "or (2) tailor a plan first - work out which steps it needs and show you before anything starts?",
+        `**New work** — The last piece of work, "${activeLabel}", is complete. You said: "${requestPreview(flags.intent)}". How should I set it up?\n\n` +
+          `1. **Start it now** — Yes, set it up as "${inferred.scope}" work\n` +
+          "2. **Tailor a plan first** — Work out which steps it needs and show you before anything starts\n" +
+          "3. **Other** — describe what you want instead\n\n" +
+          "Reply with a number (or just tell me).",
+        flags.intent,
+        inferred.scope,
+        pd,
+        askedAbout,
+      ));
+      return;
+    }
     emit(newWorkRoutingAskDirective(
       `Work is already in progress on: "${activeLabel}". You said: "${requestPreview(flags.intent)}". ` +
         `Is this (1) part of that work - continue it; (2) a separate new piece of work - ` +
@@ -5728,10 +5756,7 @@ function routeNext(args: string[], projectDir: string | undefined): void {
       flags.intent,
       inferred.scope,
       pd,
-      {
-        space: selection.space,
-        targets: [{ intent: selection.intent ?? "", uuid: intentUuidForSelection(pd, selection) ?? "" }],
-      },
+      askedAbout,
     ));
     return;
   }
