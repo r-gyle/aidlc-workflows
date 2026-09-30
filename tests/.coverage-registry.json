@@ -13082,6 +13082,10 @@
         {
           "file": "tests/unit/t342-construction-checkpoint-routing.test.ts",
           "mechanism": "cli"
+        },
+        {
+          "file": "tests/unit/t353-compose-after-completed-workflow.test.ts",
+          "mechanism": "cli"
         }
       ],
       "status": "covered"
