@@ -30256,6 +30256,13 @@ export function composerProposalPath(projectDir: string): string {
   return join(engineDirFor(intentsDir(projectDir)), "composer-proposal.json");
 }
 
+// Where the conductor writes the person's answers to the composer's questions
+// for `next compose --request <id> --with-answers`. Fixed and engine-named, for
+// the same reasons as the proposal file, so no path ever travels on a command.
+export function composerAnswersPath(projectDir: string): string {
+  return join(engineDirFor(intentsDir(projectDir)), "composer-answers.md");
+}
+
 export function loadStageGraph(): StageEntry[] {
   if (_stageGraph !== null) return _stageGraph;
   _stageGraph = loadStageGraphAll().filter((s) => s.enabled !== false);

@@ -710,11 +710,13 @@ complete without answers: decide each hinged stage on your best reading and
 name the question it rests on in that stage's rationale ("assumed backend
 only; question 1"), so approving as is runs exactly what the table shows.
 
-An answer is an edit. The re-dispatch's task text carries the person's
-answers after the original request; they are part of the task. Re-score IAE
-and UA, re-run validation, and return only the questions still open: never
-repeat one the person answered. Copy the whole task text, answers included,
-into `creationDescription`, so later stages read those decisions as the
+An answer is an edit. The engine adds the person's answers to the stored
+request, so the re-dispatch's task text carries them after the original
+request, under "Answers to the composer's questions:"; they are part of the
+task. Re-score IAE and UA, re-run validation, and return only the questions
+still open: never repeat one the person answered. `creationDescription`
+stays the task text verbatim, answers included, and the workflow is created
+from that same stored request, so later stages read those decisions as the
 person's own words instead of asking again.
 
 `guardPolicy` is REQUIRED for every mode and is ONE value with a 1-2 sentence

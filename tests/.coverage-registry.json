@@ -20,9 +20,9 @@
     "render-surface": "tui"
   },
   "counts": {
-    "total": 1223,
+    "total": 1224,
     "enumeratedByClass": {
-      "function": 894,
+      "function": 895,
       "audit": 107,
       "scope": 11,
       "stage": 33,
@@ -2668,6 +2668,13 @@
     {
       "unitClass": "function",
       "unitId": "function:composeMarkerPath",
+      "minMechanism": "none",
+      "coveredBy": [],
+      "status": "UNCOVERED"
+    },
+    {
+      "unitClass": "function",
+      "unitId": "function:composerAnswersPath",
       "minMechanism": "none",
       "coveredBy": [],
       "status": "UNCOVERED"
@@ -13085,6 +13092,10 @@
         },
         {
           "file": "tests/unit/t353-compose-after-completed-workflow.test.ts",
+          "mechanism": "cli"
+        },
+        {
+          "file": "tests/unit/t354-composer-answers.test.ts",
           "mechanism": "cli"
         }
       ],
