@@ -11,7 +11,8 @@
 //
 // Only a name that resolves to exactly one file is flagged: a file outside the
 // active record and its space's code knowledge base, a not-yet-written
-// artifact, and an ambiguous name (memory.md exists in every stage) all pass.
+// artifact, an ambiguous name (memory.md exists in every stage), and the
+// engine's aidlc-state.md all pass.
 // Code blocks and existing links are ignored. An Edit is judged on the text it
 // adds, not on older text it leaves alone. Any error allows the write.
 // AIDLC_DISABLE_LINK_GUARD=1 turns the check off.
@@ -32,6 +33,9 @@ export interface UnlinkedMention {
 
 const EXCLUDED_DIRS = new Set(["audit", ".aidlc-engine", ".git", "node_modules"]);
 const MAX_INDEXED_FILES = 5000;
+// The engine's own progress tracker: prose that names it narrates the process,
+// and a reader of an artifact gains nothing from a link to it.
+const UNLINKED_NAMES = new Set(["aidlc-state.md"]);
 
 function inside(path: string, root: string): boolean {
   return path !== root && path.startsWith(`${root}${sep}`);
@@ -115,7 +119,7 @@ export function unlinkedArtifactMentions(input: ClaudeCodeHookInput, projectDir:
   const mentions: UnlinkedMention[] = [];
   for (const name of [...names].sort()) {
     const candidates = (index.get(name) ?? []).filter((path) => path !== target);
-    if (candidates.length !== 1 || basename(target) === name) continue;
+    if (candidates.length !== 1 || basename(target) === name || UNLINKED_NAMES.has(name)) continue;
     mentions.push({ name, link: `[${name}](${posix(relative(dirname(target), candidates[0]))})` });
   }
   return mentions;

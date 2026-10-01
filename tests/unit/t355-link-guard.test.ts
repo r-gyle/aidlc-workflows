@@ -75,6 +75,7 @@ describe("t355 which mentions count", () => {
       "Every stage keeps a memory.md diary.",
       "Later we write code-summary.md.",
       "The README.md explains setup.",
+      "Progress lives in aidlc-state.md.",
     ].join("\n");
     expect(unlinkedArtifactMentions(write(target, text), proj)).toEqual([]);
   });
