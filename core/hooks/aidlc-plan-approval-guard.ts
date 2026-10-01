@@ -114,6 +114,7 @@ import {
   planReviewAppendix,
   promptTestingContractMarkers,
 } from "../tools/aidlc-testing-posture.ts";
+import { refuseUnlinkedArtifactMentions } from "./link-guard.ts";
 import { refuseRuntimeIntegrityViolation } from "./runtime-integrity.ts";
 
 export {
@@ -1612,6 +1613,9 @@ export async function run(input: string): Promise<number> {
 async function evaluate(parsed: ClaudeCodeHookInput, input: string): Promise<number> {
   // Runtime integrity is not a fence and cannot be disabled with this hook.
   if (refuseRuntimeIntegrityViolation(parsed)) return 2;
+  // Nor is the cross-artifact link rule: Guard Policy and this hook's off-switch
+  // leave it on (AIDLC_DISABLE_LINK_GUARD=1 is its own switch).
+  if (refuseUnlinkedArtifactMentions(parsed, resolveProjectDirFromHook(import.meta.url))) return 2;
 
   // Deterministic off-switch: the Plan Approval fence is disabled, recorded once.
   if (resolveProjectFlag("AIDLC_DISABLE_PLAN_APPROVAL_GUARD") === "1") {

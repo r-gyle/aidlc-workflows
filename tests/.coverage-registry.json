@@ -20,13 +20,13 @@
     "render-surface": "tui"
   },
   "counts": {
-    "total": 1250,
+    "total": 1251,
     "enumeratedByClass": {
       "function": 920,
       "audit": 108,
       "scope": 11,
       "stage": 33,
-      "hook": 19,
+      "hook": 20,
       "subcommand": 152,
       "render-surface": 7
     },
@@ -11316,6 +11316,10 @@
         {
           "file": "tests/unit/t349-audit-trail-guard.test.ts",
           "mechanism": "cli"
+        },
+        {
+          "file": "tests/unit/t355-link-guard.test.ts",
+          "mechanism": "cli"
         }
       ],
       "status": "covered"
@@ -11659,6 +11663,13 @@
         }
       ],
       "status": "covered"
+    },
+    {
+      "unitClass": "hook",
+      "unitId": "link-guard",
+      "minMechanism": "none",
+      "coveredBy": [],
+      "status": "UNCOVERED"
     },
     {
       "unitClass": "hook",

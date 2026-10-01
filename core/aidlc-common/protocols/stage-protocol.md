@@ -978,6 +978,13 @@ keeps every artifact navigable from a plain file browser or a Git host's own
 renderer, and is what any link-aware viewer (an IDE, a notes app) picks up on
 its own — no artifact needs to know one exists.
 
+The rule is enforced before the write: a write to an artifact that names
+another existing artifact by bare file name is refused with
+`ARTIFACT_LINK_REQUIRED`, and the refusal gives the exact link to use. Write
+that link and retry; nothing needs to be asked. A name that is not yet written
+or that matches several files (every stage has a `memory.md`) is not refused,
+so link those by path when you mean a specific one.
+
 Record a finding once, in the artifact that owns it, and link to it from
 elsewhere rather than repeating it. Reverse Engineering already states this
 locally for its own nine artifacts; this generalizes the same rule to every

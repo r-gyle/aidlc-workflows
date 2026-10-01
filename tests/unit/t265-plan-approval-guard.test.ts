@@ -445,6 +445,10 @@ function scratchProject(): string {
     join(dir, ".claude", "hooks", "runtime-integrity.ts"),
   );
   cpSync(
+    join(AIDLC_SRC, "hooks", "link-guard.ts"),
+    join(dir, ".claude", "hooks", "link-guard.ts"),
+  );
+  cpSync(
     join(AIDLC_SRC, "hooks", "aidlc-record-human-turn.ts"),
     join(dir, ".claude", "hooks", "aidlc-record-human-turn.ts"),
   );
